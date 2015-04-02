@@ -17,7 +17,6 @@ window.addEventListener('load', function() {
 
     // TODO ensure NETWORK is available!
     showNetworkInfo();
-    setupButtonListeners();
     setupServiceDiscovery();
     registerEchoService();
   }
@@ -53,10 +52,6 @@ window.addEventListener('load', function() {
     
   }
 
-  function setupButtonListeners() {
-
-  }
-
   function setupServiceDiscovery() {
     DNSSD.addEventListener('discovered', onServiceDiscovered);
     DNSSD.startDiscovery();
@@ -81,7 +76,13 @@ window.addEventListener('load', function() {
     
     if(echoServices.length > 0) {
       if(address !== myAddress) {
-        echoServers[address] = echoServices;
+        if(echoServers[address] === undefined) {
+          echoServers[address] = {
+            lastPinged: null,
+            sentWord: '',
+            returnedWord: ''
+          };
+        }
       }
     } else {
       unset(echoServers[address]);
@@ -97,11 +98,7 @@ window.addEventListener('load', function() {
   function updateServersList() {
     var names = Object.keys(echoServers);
     var items = names.map(function(serverName) {
-      var services = echoServers[serverName];
-      var lis = services.map(function(service) {
-        return `<li><button data-address="${service}">${service}</button></li>`;
-      }).join('');
-      return `<li>${serverName}<ul>${lis}</ul></li>`;
+      return `<li><strong>${serverName}</strong>;
     });
     serversDiv.innerHTML = `<ul>${items}</ul>`;
   }
