@@ -4,6 +4,7 @@ window.addEventListener('load', function() {
 
   const ECHO_PORT = 7;
   var myAddress = null;
+  var mySocket = null;
   var echoServers = {};
   var infoDiv, serversDiv;
 
@@ -19,6 +20,7 @@ window.addEventListener('load', function() {
     showNetworkInfo();
     setupServiceDiscovery();
     registerEchoService();
+    setupPingInterval();
   }
 
   function showNetworkInfo() {
@@ -79,27 +81,71 @@ window.addEventListener('load', function() {
         if(echoServers[address] === undefined) {
           echoServers[address] = {
             lastPinged: null,
-            sentWord: '',
-            returnedWord: ''
+            sentWord: null,
+            returnedWord: null
           };
         }
       }
     } else {
-      unset(echoServers[address]);
+      delete(echoServers[address]);
     }
 
     updateServersList();
   }
 
   function registerEchoService() {
+    
+    mySocket = new UDPSocket({
+      localPort: ECHO_PORT
+    });
+
+    var decoder = new TextDecoder('utf-8');
+    
+    mySocket.onmessage = (message) => {
+      var decodedMessage = decoder.decode(message.data);
+      console.log('got message!!!' + decodedMessage);
+    };
+
     DNSSD.registerService('_echo._udp.local', ECHO_PORT, {});
   }
 
   function updateServersList() {
     var names = Object.keys(echoServers);
     var items = names.map(function(serverName) {
-      return `<li><strong>${serverName}</strong>;
+      return `<li><strong>${serverName}</strong>`;
     });
     serversDiv.innerHTML = `<ul>${items}</ul>`;
+  }
+
+  function setupPingInterval() {
+    setInterval(pingServers, 5000);
+    pingServers();
+  }
+
+  function pingServers() {
+    var keys = Object.keys(echoServers);
+    keys.forEach(address => {
+      var details = echoServers[address];
+      // Only ping them if we haven't yet
+      if(details.sentWord === null) {
+        pingServer(address);
+      }
+    });
+  }
+
+  function pingServer(address) {
+    
+
+    var socket = new UDPSocket({
+      remoteAddress: address,
+      remotePort: ECHO_PORT
+    });
+
+    socket.opened.then(() => {
+
+      socket.send('ping?');
+
+    });
+
   }
 });
