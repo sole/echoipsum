@@ -17,6 +17,7 @@ window.addEventListener('load', function() {
 
     // TODO ensure NETWORK is available!
     showNetworkInfo();
+    setupButtonListeners();
     setupServiceDiscovery();
     registerEchoService();
   }
@@ -52,6 +53,10 @@ window.addEventListener('load', function() {
     
   }
 
+  function setupButtonListeners() {
+
+  }
+
   function setupServiceDiscovery() {
     DNSSD.addEventListener('discovered', onServiceDiscovered);
     DNSSD.startDiscovery();
@@ -59,11 +64,20 @@ window.addEventListener('load', function() {
 
   function onServiceDiscovered(ev) {
     var address = ev.address;
-    // TODO: weird thing, services registered with dns-sd
-    // seem to be registered/detected twice
-    var echoServices = ev.services.filter(service => {
+        var echoServices = ev.services.filter(service => {
       return service.match('echo');
     });
+
+    // TODO: weird thing, services registered with dns-sd
+    // seem to be registered/detected twice, so we'll deduplicate.
+    var tmpServices = [];
+    echoServices.forEach(service => {
+      if(tmpServices.indexOf(service) === -1) {
+        tmpServices.push(service);
+      }
+    });
+
+    echoServices = tmpServices;
     
     if(echoServices.length > 0) {
       if(address !== myAddress) {
