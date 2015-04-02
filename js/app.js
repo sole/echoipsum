@@ -3,6 +3,7 @@ window.addEventListener('load', function() {
   'use strict';
 
   const ECHO_PORT = 7;
+  var myAddress = null;
   var echoServers = {};
   var infoDiv, serversDiv;
 
@@ -40,6 +41,7 @@ window.addEventListener('load', function() {
 
     if(connInfo) {
       fields.push(['ip', connInfo.ipAddress]);
+      myAddress = connInfo.ipAddress;
     }
     
     var txt = fields.map(function(pair) {
@@ -57,12 +59,16 @@ window.addEventListener('load', function() {
 
   function onServiceDiscovered(ev) {
     var address = ev.address;
+    // TODO: weird thing, services registered with dns-sd
+    // seem to be registered/detected twice
     var echoServices = ev.services.filter(service => {
       return service.match('echo');
     });
     
     if(echoServices.length > 0) {
-      echoServers[address] = echoServices;
+      if(address !== myAddress) {
+        echoServers[address] = echoServices;
+      }
     } else {
       unset(echoServers[address]);
     }
@@ -75,6 +81,14 @@ window.addEventListener('load', function() {
   }
 
   function updateServersList() {
-    serversDiv.innerHTML = "currently " + Object.keys(echoServers).length;
+    var names = Object.keys(echoServers);
+    var items = names.map(function(serverName) {
+      var services = echoServers[serverName];
+      var lis = services.map(function(service) {
+        return `<li><button data-address="${service}">${service}</button></li>`;
+      }).join('');
+      return `<li>${serverName}<ul>${lis}</ul></li>`;
+    });
+    serversDiv.innerHTML = `<ul>${items}</ul>`;
   }
 });
