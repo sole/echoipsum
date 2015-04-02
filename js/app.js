@@ -6,7 +6,8 @@ window.addEventListener('load', function() {
   var myAddress = null;
   var mySocket = null;
   var echoServers = {};
-  var infoDiv, serversDiv;
+  var infoDiv, serversDiv, messagesDiv;
+  var loremIpsum = 'lorem ipsum dolor amet'.split(' ');
 
   init();
 
@@ -15,6 +16,7 @@ window.addEventListener('load', function() {
 
     infoDiv = document.getElementById('info');
     serversDiv = document.getElementById('servers');
+    messagesDiv = document.getElementById('messages');
 
     // TODO ensure NETWORK is available!
     showNetworkInfo();
@@ -93,6 +95,7 @@ window.addEventListener('load', function() {
     updateServersList();
   }
 
+  
   function registerEchoService() {
     
     mySocket = new UDPSocket({
@@ -103,11 +106,12 @@ window.addEventListener('load', function() {
     
     mySocket.onmessage = (message) => {
       var decodedMessage = decoder.decode(message.data);
-      console.log('got message!!!' + decodedMessage);
+      messagesDiv.innerHTML = decodedMessage;
     };
 
     DNSSD.registerService('_echo._udp.local', ECHO_PORT, {});
   }
+
 
   function updateServersList() {
     var names = Object.keys(echoServers);
@@ -118,7 +122,7 @@ window.addEventListener('load', function() {
   }
 
   function setupPingInterval() {
-    setInterval(pingServers, 5000);
+    setInterval(pingServers, 1000);
     pingServers();
   }
 
@@ -134,7 +138,9 @@ window.addEventListener('load', function() {
   }
 
   function pingServer(address) {
-    
+   
+    var wordIndex = Math.round(Math.random() * loremIpsum.length) % loremIpsum.length;
+    var word = loremIpsum[wordIndex];
 
     var socket = new UDPSocket({
       remoteAddress: address,
@@ -142,9 +148,7 @@ window.addEventListener('load', function() {
     });
 
     socket.opened.then(() => {
-
-      socket.send('ping?');
-
+      socket.send(word);
     });
 
   }
