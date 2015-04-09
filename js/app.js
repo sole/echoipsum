@@ -7,7 +7,7 @@ window.addEventListener('load', function() {
   var mySocket = null;
   var echoServers = {};
   var infoDiv, serversDiv, messagesDiv;
-  var loremIpsum = 'lorem ipsum dolor amet'.split(' ');
+  var loremIpsum = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'.split(' ');
 
   init();
 
@@ -106,7 +106,7 @@ window.addEventListener('load', function() {
     
     mySocket.onmessage = (message) => {
       var decodedMessage = decoder.decode(message.data);
-      messagesDiv.innerHTML = decodedMessage + ' from ' + message.remoteAddress;
+      messagesDiv.innerHTML = `<div class="message">${decodedMessage}</div> from ${message.remoteAddress}`;
     };
 
     DNSSD.registerService('_echo._udp.local', ECHO_PORT, {});
