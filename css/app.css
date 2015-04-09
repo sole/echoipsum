@@ -23,3 +23,6 @@ ul {
   list-style-position: inside;
 }
 
+.message {
+  font-size: 3rem;
+}
