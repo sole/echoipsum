@@ -1,6 +1,8 @@
 # echoipsum
 
-This is a certified app experimenting with mDNS and echo servers and all that stuff in Firefox OS.
+This app will look for other instances of the app in the network and start sending a word of "Lorem ipsum" to each other server.
+
+It is a certified app experimenting with mDNS and echo servers and all that stuff in Firefox OS.
 
 It's very simple and it's more of an exercise for me to learn than a very good example of how this should be done probably. Please excuse any weird thing here :-)
 
