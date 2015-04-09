@@ -106,7 +106,7 @@ window.addEventListener('load', function() {
     
     mySocket.onmessage = (message) => {
       var decodedMessage = decoder.decode(message.data);
-      messagesDiv.innerHTML = decodedMessage;
+      messagesDiv.innerHTML = decodedMessage + ' from ' + message.remoteAddress;
     };
 
     DNSSD.registerService('_echo._udp.local', ECHO_PORT, {});
@@ -149,6 +149,9 @@ window.addEventListener('load', function() {
 
     socket.opened.then(() => {
       socket.send(word);
+      // close the socket or else... BOOOOOOM
+      // See: https://bugzilla.mozilla.org/show_bug.cgi?id=1152283
+      socket.close();
     });
 
   }
